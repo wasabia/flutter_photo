@@ -107,6 +107,7 @@ class _PhotoMainPageState extends State<PhotoMainPage>
         style: textStyle,
         child: Scaffold(
           appBar: AppBar(
+            backgroundColor: options.themeColor,
             leading: IconButton(
               icon: Icon(
                 Icons.close,
@@ -114,23 +115,29 @@ class _PhotoMainPageState extends State<PhotoMainPage>
               ),
               onPressed: _cancel,
             ),
-            title: Text(
-              i18nProvider.getTitleText(options),
-              style: TextStyle(
-                color: options.textColor,
+            // title: Text(
+            //   i18nProvider.getTitleText(options),
+            //   style: TextStyle(
+            //     color: options.textColor,
+            //   ),
+            // ),
+            title: FlatButton(
+              onPressed: _showGallerySelectDialog,
+              splashColor: Colors.transparent,
+              child: Text(
+                currentGalleryName, style: textStyle,
               ),
             ),
             actions: <Widget>[
-              FlatButton(
-                splashColor: Colors.transparent,
-                child: Text(
-                  i18nProvider.getSureText(options, selectedCount),
-                  style: selectedCount == 0
-                      ? textStyle.copyWith(color: options.disableColor)
-                      : textStyle,
-                ),
-                onPressed: selectedCount == 0 ? null : sure,
-              ),
+              // FlatButton(
+              //   splashColor: Colors.transparent,
+              //   child: Text(
+              //     i18nProvider.getSureText(options, selectedCount),
+              //     style: selectedCount == 0 ? textStyle.copyWith(color: options.disableColor)
+              //         : textStyle,
+              //   ),
+              //   onPressed: selectedCount == 0 ? null : sure,
+              // ),
             ],
           ),
           body: _buildBody(),
@@ -143,10 +150,24 @@ class _PhotoMainPageState extends State<PhotoMainPage>
             onTapPreview: selectedList.isEmpty ? null : _onTapPreview,
             selectedProvider: this,
             galleryListProvider: this,
+            sure: sure
           ),
         ),
       ),
     );
+  }
+
+  void _showGallerySelectDialog() async {
+    var result = await showModalBottomSheet(
+      context: context,
+      builder: (ctx) => ChangeGalleryDialog(
+        galleryList: galleryPathList,
+        i18n: i18nProvider,
+        options: options,
+      ),
+    );
+
+    if (result != null) _onGalleryChange?.call(result);
   }
 
   void _cancel() {
@@ -335,12 +356,15 @@ class _PhotoMainPageState extends State<PhotoMainPage>
           color: options.textColor,
         ),
       );
-      decoration = BoxDecoration(color: themeColor);
+      decoration = BoxDecoration(
+        color: Color.fromRGBO(2, 195, 95, 1),
+        borderRadius: BorderRadius.circular(36.0),
+      );
     } else {
       decoration = BoxDecoration(
-        borderRadius: BorderRadius.circular(1.0),
+        borderRadius: BorderRadius.circular(36.0),
         border: Border.all(
-          color: themeColor,
+          color: Colors.white
         ),
       );
     }

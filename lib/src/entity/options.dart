@@ -33,6 +33,11 @@ class Options {
 
   final PickType pickType;
 
+  final bool fullscreenDialog;
+
+  final Color bottomBarColor;
+  final Color bottomBarTextColor;
+
   const Options({
     this.rowCount,
     this.maxSelected,
@@ -48,6 +53,9 @@ class Options {
     this.loadingDelegate,
     this.badgeDelegate,
     this.pickType,
+    this.fullscreenDialog,
+    this.bottomBarColor,
+    this.bottomBarTextColor
   });
 }
 

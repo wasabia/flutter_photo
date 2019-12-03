@@ -63,7 +63,7 @@ class PhotoPicker {
   static Future<List<AssetEntity>> pickAsset({
     @required BuildContext context,
     int rowCount = 4,
-    int maxSelected = 9,
+    int maxSelected,
     double padding = 0.5,
     double itemRadio = 1.0,
     Color themeColor,
@@ -78,6 +78,10 @@ class PhotoPicker {
     PickType pickType = PickType.all,
     BadgeDelegate badgeDelegate = const DefaultBadgeDelegate(),
     List<AssetPathEntity> photoPathList,
+    bool fullscreenDialog,
+    Color bottomBarColor,
+    Color bottomBarTextColor,
+    Color unselectBottomCheckboxColor
   }) {
     assert(provider != null, "provider must be not null");
     assert(context != null, "context must be not null");
@@ -92,6 +96,10 @@ class PhotoPicker {
     checkBoxBuilderDelegate ??= DefaultCheckBoxBuilderDelegate();
 
     loadingDelegate ??= DefaultLoadingDelegate();
+
+    fullscreenDialog ??= false;
+    bottomBarColor ??= themeColor;
+    bottomBarTextColor ??= themeColor;
 
     var options = Options(
       rowCount: rowCount,
@@ -108,6 +116,9 @@ class PhotoPicker {
       loadingDelegate: loadingDelegate,
       badgeDelegate: badgeDelegate,
       pickType: pickType,
+      fullscreenDialog: fullscreenDialog,
+      bottomBarColor: bottomBarColor,
+      bottomBarTextColor: bottomBarTextColor
     );
 
     return PhotoPicker()._pickAsset(
@@ -150,10 +161,11 @@ class PhotoPicker {
     return Navigator.of(context).push(
       MaterialPageRoute(
         builder: (ctx) => PhotoApp(
-              options: options,
-              provider: provider,
-              photoList: photoList,
-            ),
+          options: options,
+          provider: provider,
+          photoList: photoList,
+        ),
+        fullscreenDialog: options.fullscreenDialog
       ),
     );
   }

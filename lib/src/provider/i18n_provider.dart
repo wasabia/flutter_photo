@@ -37,12 +37,18 @@ class CNProvider extends I18nProvider {
 
   @override
   String getPreviewText(Options options, SelectedProvider selectedProvider) {
-    return "预览(${selectedProvider.selectedCount})";
+    // return "预览(${selectedProvider.selectedCount})";
+    return "预览";
   }
 
   @override
   String getSureText(Options options, int currentCount) {
-    return "确定($currentCount/${options.maxSelected})";
+    if(options.maxSelected != null) {
+      return "确定($currentCount)";
+    } else {
+      return "确定($currentCount)";
+    }
+    
   }
 
   @override
@@ -87,7 +93,12 @@ class ENProvider extends I18nProvider {
 
   @override
   String getSureText(Options options, int currentCount) {
-    return "Save ($currentCount/${options.maxSelected})";
+    if(options.maxSelected != null) {
+      return "Save ($currentCount/${options.maxSelected})";
+    } else {
+      return "Save ($currentCount)";
+    }
+    
   }
 
   @override

@@ -13,6 +13,7 @@ class _BottomWidget extends StatefulWidget {
 
   final GalleryListProvider galleryListProvider;
   final VoidCallback onTapPreview;
+  final Function sure;
 
   const _BottomWidget({
     Key key,
@@ -23,23 +24,23 @@ class _BottomWidget extends StatefulWidget {
     this.galleryName = "",
     this.galleryListProvider,
     this.onTapPreview,
+    this.sure
   }) : super(key: key);
 
   @override
   __BottomWidgetState createState() => __BottomWidgetState();
 }
 
-class __BottomWidgetState extends State<_BottomWidget> {
+class __BottomWidgetState extends State<_BottomWidget> with SelectedProvider {
   Options get options => widget.options;
 
   I18nProvider get i18nProvider => widget.provider;
 
   @override
   Widget build(BuildContext context) {
-    var textStyle = TextStyle(fontSize: 14.0);
-    const textPadding = const EdgeInsets.symmetric(horizontal: 16.0);
+    var textStyle = TextStyle(fontSize: 14.0, color: Colors.white);
     return Container(
-      color: options.themeColor,
+      color: options.bottomBarColor,
       child: SafeArea(
         bottom: true,
         top: false,
@@ -48,36 +49,35 @@ class __BottomWidgetState extends State<_BottomWidget> {
           child: Row(
             children: <Widget>[
               FlatButton(
-                onPressed: _showGallerySelectDialog,
-                splashColor: Colors.transparent,
-                child: Container(
-                  alignment: Alignment.center,
-                  height: 44.0,
-                  padding: textPadding,
-                  child: Text(
-                    widget.galleryName,
-                    style: textStyle.copyWith(color: options.textColor),
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Container(),
-              ),
-              FlatButton(
                 onPressed: widget.onTapPreview,
-                textColor: options.textColor,
+                textColor: Colors.white,
                 splashColor: Colors.transparent,
                 disabledTextColor: options.disableColor,
                 child: Container(
                   height: 44.0,
                   alignment: Alignment.center,
                   child: Text(
-                    i18nProvider.getPreviewText(
-                        options, widget.selectedProvider),
-                    style: textStyle,
+                    i18nProvider.getPreviewText(options, widget.selectedProvider),
+                    style: selectedCount == 0
+                      ? textStyle.copyWith(color: options.disableColor)
+                      : textStyle,
                   ),
-                  padding: textPadding,
                 ),
+              ),
+
+              Expanded(
+                child: Container(),
+              ),
+
+              FlatButton(
+                splashColor: Colors.transparent,
+                child: Text(
+                  i18nProvider.getSureText(options, widget.selectedProvider.selectedCount),
+                  style: widget.selectedProvider.selectedCount == 0
+                      ? textStyle.copyWith(color: options.disableColor)
+                      : textStyle,
+                ),
+                onPressed: widget.selectedProvider.selectedCount == 0 ? null : sure,
               ),
             ],
           ),
@@ -86,16 +86,16 @@ class __BottomWidgetState extends State<_BottomWidget> {
     );
   }
 
-  void _showGallerySelectDialog() async {
-    var result = await showModalBottomSheet(
-      context: context,
-      builder: (ctx) => ChangeGalleryDialog(
-            galleryList: widget.galleryListProvider.galleryPathList,
-            i18n: i18nProvider,
-            options: options,
-          ),
-    );
 
-    if (result != null) widget.onGalleryChange?.call(result);
+  @override
+  bool isUpperLimit() {
+    // TODO: implement isUpperLimit
+    return null;
+  }
+
+  @override
+  void sure() {
+    widget.sure();
+    // TODO: implement sure
   }
 }

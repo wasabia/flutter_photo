@@ -41,6 +41,8 @@ class _PhotoPreviewPageState extends State<PhotoPreviewPage> {
 
   Color get themeColor => options.themeColor;
 
+  Color get bottomBarColor => options.bottomBarColor;
+
   Color get textColor => options.textColor;
 
   SelectedProvider get selectedProvider => widget.selectedProvider;
@@ -105,53 +107,51 @@ class _PhotoPreviewPageState extends State<PhotoPreviewPage> {
       data: data.copyWith(
         primaryColor: options.themeColor,
       ),
-      child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: config.options.themeColor,
-          leading: BackButton(
-            color: options.textColor,
-          ),
-          title: StreamBuilder(
-            stream: pageStream,
-            initialData: widget.initIndex,
-            builder: (ctx, snap) => Text(
-                  "${snap.data + 1}/${widget.list.length}",
-                  style: TextStyle(
-                    color: options.textColor,
-                  ),
-                ),
-          ),
-          actions: <Widget>[
-            StreamBuilder(
-              stream: pageStream,
-              builder: (ctx, s) => FlatButton(
-                    splashColor: Colors.transparent,
-                    onPressed: selectedList.length == 0 ? null : sure,
-                    child: Text(
-                      config.provider.getSureText(options, selectedList.length),
-                      style: selectedList.length == 0
-                          ? textStyle.copyWith(color: options.disableColor)
-                          : textStyle,
-                    ),
-                  ),
+      child: DefaultTextStyle(
+        style: textStyle,
+        child: Scaffold(
+          appBar: AppBar(
+            backgroundColor: config.options.themeColor,
+            // leading: BackButton(
+            //   color: options.textColor,
+            // ),
+            leading: IconButton(
+              icon: Icon(
+                Icons.keyboard_arrow_left,
+                color: options.textColor,
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
             ),
-          ],
+            title: StreamBuilder(
+              stream: pageStream,
+              initialData: widget.initIndex,
+              builder: (ctx, snap) => Text(
+                "${snap.data + 1}/${widget.list.length}",
+                style: textStyle,
+              ),
+            ),
+            actions: <Widget>[
+              _buildCheckbox(),
+            ],
+          ),
+          body: PageView.builder(
+            controller: pageController,
+            itemBuilder: _buildItem,
+            itemCount: list.length,
+            onPageChanged: _onPageChanged,
+          ),
+          bottomSheet: _buildThumb(),
+          bottomNavigationBar: _buildBottom(),
         ),
-        body: PageView.builder(
-          controller: pageController,
-          itemBuilder: _buildItem,
-          itemCount: list.length,
-          onPageChanged: _onPageChanged,
-        ),
-        bottomSheet: _buildThumb(),
-        bottomNavigationBar: _buildBottom(),
-      ),
+      ),  
     );
   }
 
   Widget _buildBottom() {
     return Container(
-      color: themeColor,
+      color: bottomBarColor,
       child: SafeArea(
         child: Container(
           height: 52.0,
@@ -160,11 +160,33 @@ class _PhotoPreviewPageState extends State<PhotoPreviewPage> {
               Expanded(
                 child: Container(),
               ),
-              _buildCheckbox(),
+              
+              _buildSure()
             ],
           ),
         ),
       ),
+    );
+  }
+
+  _buildSure() {
+    var textStyle = TextStyle(
+      color: options.textColor,
+      fontSize: 14.0,
+    );
+
+    return StreamBuilder(
+      stream: pageStream,
+      builder: (ctx, s) => FlatButton(
+            splashColor: Colors.transparent,
+            onPressed: selectedList.length == 0 ? null : sure,
+            child: Text(
+              config.provider.getSureText(options, selectedList.length),
+              style: selectedList.length == 0
+                  ? textStyle.copyWith(color: options.disableColor)
+                  : textStyle,
+            ),
+          ),
     );
   }
 
@@ -204,13 +226,51 @@ class _PhotoPreviewPageState extends State<PhotoPreviewPage> {
   }
 
   Widget _buildCheckboxContent(bool checked, int index) {
-    return options.checkBoxBuilderDelegate.buildCheckBox(
-      context,
-      checked,
-      index,
-      options,
-      config.provider,
+    BoxDecoration decoration;
+    Widget child;
+
+    if(checked) {
+      decoration = BoxDecoration(
+        color: Color.fromRGBO(2, 195, 95, 1),
+        borderRadius: BorderRadius.circular(24.0),
+      );
+      child = Text(
+        (index + 1).toString(),
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontSize: 12.0,
+          color: options.textColor,
+        ),
+      );
+    } else {
+      decoration = BoxDecoration(
+        borderRadius: BorderRadius.circular(24.0),
+        border: Border.all(
+          color: Colors.white
+        ),
+      );
+    }
+
+    return Container(
+      width: 24,
+      height: 24,
+      margin: EdgeInsets.only(top: 16, right: 16),
+      // padding: const EdgeInsets.all(8.0),
+      child: AnimatedContainer(
+        duration: Duration(milliseconds: 300),
+        decoration: decoration,
+        alignment: Alignment.center,
+        child: child,
+      ),
     );
+
+    // return options.checkBoxBuilderDelegate.buildCheckBox(
+    //   context,
+    //   checked,
+    //   index,
+    //   options,
+    //   config.provider,
+    // );
   }
 
   void _changeSelected(bool isChecked, int index) {
@@ -263,23 +323,26 @@ class _PhotoPreviewPageState extends State<PhotoPreviewPage> {
   Widget _buildThumb() {
     return StreamBuilder(
       builder: (ctx, snapshot) => Container(
-            height: 80.0,
-            child: ListView.builder(
-              itemBuilder: _buildThumbItem,
-              itemCount: previewList.length,
-              scrollDirection: Axis.horizontal,
-            ),
-          ),
+        height: 80.0,
+        child: ListView.builder(
+          itemBuilder: _buildThumbItem,
+          itemCount: previewList.length,
+          scrollDirection: Axis.horizontal,
+        ),
+      ),
       stream: pageStream,
     );
   }
 
   Widget _buildThumbItem(BuildContext context, int index) {
     var item = previewList[index];
+
+
     return RepaintBoundary(
       child: GestureDetector(
         onTap: () => changeSelected(item, index),
         child: Container(
+          padding: EdgeInsets.fromLTRB(5, 5, 5, 5),
           width: 80.0,
           child: Stack(
             children: <Widget>[
@@ -294,7 +357,14 @@ class _PhotoPreviewPageState extends State<PhotoPreviewPage> {
                   stream: pageStream,
                   builder: (BuildContext context, AsyncSnapshot snapshot) {
                     if (selectedList.contains(item)) {
-                      return Container();
+                      return Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Color.fromRGBO(2, 195, 95, 1),
+                            width: 3,
+                          ),
+                        ),
+                      );
                     }
                     return Container(
                       color: Colors.white.withOpacity(0.5),
