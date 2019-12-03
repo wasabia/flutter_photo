@@ -128,6 +128,7 @@ class _PhotoPreviewPageState extends State<PhotoPreviewPage> {
       data: data.copyWith(
         primaryColor: options.themeColor,
       ),
+<<<<<<< HEAD
       child: DefaultTextStyle(
         style: textStyle,
         child: Scaffold(
@@ -165,6 +166,47 @@ class _PhotoPreviewPageState extends State<PhotoPreviewPage> {
           ),
           bottomSheet: _buildThumb(),
           bottomNavigationBar: _buildBottom(),
+=======
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: config.options.themeColor,
+          leading: BackButton(
+            color: options.textColor,
+          ),
+          title: StreamBuilder(
+            stream: pageStream,
+            initialData: widget.initIndex,
+            builder: (ctx, snap) {
+              return Text(
+                "${snap.data + 1}/$totalCount",
+                style: TextStyle(
+                  color: options.textColor,
+                ),
+              );
+            },
+          ),
+          actions: <Widget>[
+            StreamBuilder(
+              stream: pageStream,
+              builder: (ctx, s) => FlatButton(
+                splashColor: Colors.transparent,
+                onPressed: selectedList.length == 0 ? null : sure,
+                child: Text(
+                  config.provider.getSureText(options, selectedList.length),
+                  style: selectedList.length == 0
+                      ? textStyle.copyWith(color: options.disableColor)
+                      : textStyle,
+                ),
+              ),
+            ),
+          ],
+        ),
+        body: PageView.builder(
+          controller: pageController,
+          itemBuilder: _buildItem,
+          itemCount: totalCount,
+          onPageChanged: _onPageChanged,
+>>>>>>> a6418cb1f930097503ee5074565029b334e98360
         ),
       ),  
     );

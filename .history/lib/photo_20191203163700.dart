@@ -165,7 +165,10 @@ class PhotoPicker {
           provider: provider,
           photoList: photoList,
         ),
+<<<<<<< HEAD
         fullscreenDialog: options.fullscreenDialog
+=======
+>>>>>>> a6418cb1f930097503ee5074565029b334e98360
       ),
     );
   }

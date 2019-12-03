@@ -169,7 +169,11 @@ packages:
       name: test_api
       url: "https://pub.dartlang.org"
     source: hosted
+<<<<<<< HEAD
     version: "0.2.11"
+=======
+    version: "0.2.5"
+>>>>>>> a6418cb1f930097503ee5074565029b334e98360
   typed_data:
     dependency: transitive
     description:
@@ -192,4 +196,8 @@ packages:
     source: hosted
     version: "3.5.0"
 sdks:
+<<<<<<< HEAD
   dart: ">=2.4.0 <3.0.0"
+=======
+  dart: ">=2.2.2 <3.0.0"
+>>>>>>> a6418cb1f930097503ee5074565029b334e98360

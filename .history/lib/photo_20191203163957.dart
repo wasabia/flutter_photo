@@ -165,6 +165,7 @@ class PhotoPicker {
           provider: provider,
           photoList: photoList,
         ),
+<<<<<<< HEAD
         fullscreenDialog: options.fullscreenDialog
       ),
     );
