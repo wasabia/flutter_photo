@@ -81,12 +81,20 @@ class _PhotoMainPageState extends State<PhotoMainPage>
   @override
   void initState() {
     super.initState();
-    _refreshList();
     scaffoldKey = GlobalKey();
     scrollController = ScrollController();
     _changeThrottle = Throttle(onCall: _onAssetChange);
     PhotoManager.addChangeCallback(_changeThrottle.call);
     PhotoManager.startChangeNotify();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_isInit) {
+      addPickedAsset(PhotoPickerProvider.of(context).pickedAssetList.toList());
+      _refreshList();
+    }
   }
 
   @override
@@ -208,7 +216,8 @@ class _PhotoMainPageState extends State<PhotoMainPage>
     );
   }
 
-  void _refreshList() {
+  void _refreshList() async {
+    await Future.delayed(Duration.zero);
     if (!useAlbum) {
       _refreshListFromWidget();
       return;
@@ -218,15 +227,7 @@ class _PhotoMainPageState extends State<PhotoMainPage>
   }
 
   Future<void> _refreshListFromWidget() async {
-    galleryPathList.clear();
-    galleryPathList.addAll(widget.photoList);
-    this.list.clear();
-    var assetList = await galleryPathList[0].assetList;
-    _sortAssetList(assetList);
-    this.list.addAll(assetList);
-    setState(() {
-      _isInit = true;
-    });
+    _onRefreshAssetPathList(widget.photoList);
   }
 
   Future<void> _refreshListFromGallery() async {
@@ -242,6 +243,10 @@ class _PhotoMainPageState extends State<PhotoMainPage>
         pathList = await PhotoManager.getAssetPathList();
     }
 
+    _onRefreshAssetPathList(pathList);
+  }
+
+  Future<void> _onRefreshAssetPathList(List<AssetPathEntity> pathList) async {
     if (pathList == null) {
       return;
     }
@@ -265,10 +270,6 @@ class _PhotoMainPageState extends State<PhotoMainPage>
     setState(() {
       _isInit = true;
     });
-  }
-
-  void _sortAssetList(List<AssetEntity> assetList) {
-    options?.sortDelegate?.assetDelegate?.sort(assetList);
   }
 
   Widget _buildBody() {
@@ -418,7 +419,7 @@ class _PhotoMainPageState extends State<PhotoMainPage>
   }
 
   void _onItemClick(AssetEntity data, int index) {
-    var result = new PhotoPreviewResult();
+    var result = PhotoPreviewResult();
     isPushed = true;
     Navigator.of(context).push(
       MaterialPageRoute(
@@ -449,7 +450,7 @@ class _PhotoMainPageState extends State<PhotoMainPage>
   }
 
   void _onTapPreview() async {
-    var result = new PhotoPreviewResult();
+    var result = PhotoPreviewResult();
     isPushed = true;
     var v = await Navigator.of(context).push(
       MaterialPageRoute(
