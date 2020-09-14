@@ -1,5 +1,35 @@
 # CHANGELOG
 
+## 0.5.0
+
+Rollback to 0.5.1 photo_manager
+
+## 0.5.0-dev.3
+
+Fix:
+
+video type error.
+
+Feature:
+
+Clear memory cache.
+
+## 0.5.0-dev.2
+
+- Rollback photo_manager
+
+Fix:
+
+- no selected text
+
+## 0.4.8
+
+- Rollback photo_manager
+
+Fix:
+
+- pickedAssetList error
+
 ## 0.4.7
 
 - Rollback photo_manager.

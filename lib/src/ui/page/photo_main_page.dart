@@ -65,6 +65,8 @@ class _PhotoMainPageState extends State<PhotoMainPage>
   String get currentGalleryName {
     if (currentPath?.isAll == true) {
       return i18nProvider.getAllGalleryText(options);
+    } else if (currentPath == null) {
+      return i18nProvider.getNoSelectedText(options);
     }
     return currentPath?.name ?? "Select Folder";
   }
@@ -92,7 +94,8 @@ class _PhotoMainPageState extends State<PhotoMainPage>
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (!_isInit) {
-      addPickedAsset(PhotoPickerProvider.of(context).pickedAssetList.toList());
+      final pickedList = PhotoPickerProvider.of(context).pickedAssetList ?? [];
+      addPickedAsset(pickedList.toList());
       _refreshList();
     }
   }
@@ -234,13 +237,14 @@ class _PhotoMainPageState extends State<PhotoMainPage>
     List<AssetPathEntity> pathList;
     switch (options.pickType) {
       case PickType.onlyImage:
-        pathList = await PhotoManager.getImageAsset();
+        pathList = await PhotoManager.getAssetPathList(type: RequestType.image);
         break;
       case PickType.onlyVideo:
-        pathList = await PhotoManager.getVideoAsset();
+        pathList = await PhotoManager.getAssetPathList(type: RequestType.video);
         break;
       default:
-        pathList = await PhotoManager.getAssetPathList();
+        pathList = await PhotoManager.getAssetPathList(
+            type: RequestType.image | RequestType.video);
     }
 
     _onRefreshAssetPathList(pathList);
@@ -525,10 +529,10 @@ class _PhotoMainPageState extends State<PhotoMainPage>
     List<AssetPathEntity> pathList;
     switch (options.pickType) {
       case PickType.onlyImage:
-        pathList = await PhotoManager.getImageAsset();
+        pathList = await PhotoManager.getAssetPathList(type: RequestType.image);
         break;
       case PickType.onlyVideo:
-        pathList = await PhotoManager.getVideoAsset();
+        pathList = await PhotoManager.getAssetPathList(type: RequestType.image);
         break;
       default:
         pathList = await PhotoManager.getAssetPathList();
